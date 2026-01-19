@@ -35,6 +35,7 @@ def string_to_action_tokens(action_string: str) -> list[int]:
     actions = action_string.split(",")
     # Convert each string to integar
     action_tokens = [int(action.strip()) for action in actions if action.strip()]
+    print(action_tokens)
     return action_tokens
 
 
@@ -81,8 +82,9 @@ def action_token_reward(response: str, ground_truth: str) -> float:
         anwer_action_detokenized = tokenizer.decode(answer_tokens)
         ground_truth_action_detokenized = tokenizer.decode(ground_truth_tokens)
         # answer_action_detokenized [1,10,7]
-        error = np.mean(np.abs(np.array(anwer_action_detokenized) - np.array(ground_truth_action_detokenized)))
-        return max(0, 1 - error)
+        mse_error = np.mean((anwer_action_detokenized - ground_truth_action_detokenized) ** 2)
+        error = float(mse_error)
+        return max(0, 1 - error * 5)
     except Exception as e:
         print(f"Error in action_token_reward: {e}")
         return 0
