@@ -14,12 +14,15 @@
 import re
 from typing import Any
 
-from mathruler.grader import extract_boxed_content, grade_answer
+from mathruler.grader import extract_boxed_content
 import numpy as np
 from transformers import AutoProcessor
 
 # Load the tokenizer from the Hugging Face hub
 tokenizer = AutoProcessor.from_pretrained("physical-intelligence/fast", trust_remote_code=True)
+#need initialize tokenizer by encoding a dummy reward_input
+dummy_action = np.random.rand(1,10,7)
+_ = tokenizer(dummy_action)
 
 # Metadata
 REWARD_NAME = "math"
@@ -43,7 +46,27 @@ def format_reward(response: str) -> float:
 
 def accuracy_reward(response: str, ground_truth: str) -> float:
     answer = extract_boxed_content(response)
-    return 1.0 if grade_answer(answer, ground_truth) else 0.0
+    try:
+        answer_tokens = string_to_action_tokens(answer)
+        ground_truth_tokens = string_to_action_tokens(ground_truth)
+        if not answer_tokens or not ground_truth_tokens:
+            return 0.0
+        max_len = max(len(answer_tokens), len(ground_truth_tokens))
+        dp = [0] * (len(ground_truth_tokens) + 1)
+        for answer_token in answer_tokens:
+            prev = 0
+            for idx, ground_truth_token in enumerate(ground_truth_tokens, start=1):
+                current = dp[idx]
+                if answer_token == ground_truth_token:
+                    dp[idx] = prev + 1
+                else:
+                    dp[idx] = max(dp[idx], dp[idx - 1])
+                prev = current
+        lcs_length = dp[-1]
+        return lcs_length / max_len
+    except Exception as e:
+        print(f"Error in accuracy_reward: {e}")
+        return 0.0
 
 
 def action_token_reward(response: str, ground_truth: str) -> float:
