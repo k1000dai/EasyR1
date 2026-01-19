@@ -35,7 +35,6 @@ def string_to_action_tokens(action_string: str) -> list[int]:
     actions = action_string.split(",")
     # Convert each string to integar
     action_tokens = [int(action.strip()) for action in actions if action.strip()]
-    print(action_tokens)
     return action_tokens
 
 
