@@ -6,7 +6,7 @@ MODEL_PATH=Qwen/Qwen3-VL-8B-Instruct  # replace it with your local file path
 
 python3 -m verl.trainer.main \
 	config=examples/config.yaml \
-	data.train_files=@k1000dai/libero-fasttoken-v3train \
+	data.train_files=k1000dai/libero-fasttoken-v3@train \
 	data.val_files=k1000dai/libero-fasttoken-v3@val \
 	data.min_pixels=65530 \
     algorithm.disable_kl=True \
