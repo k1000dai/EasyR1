@@ -10,8 +10,8 @@ python3 -m verl.trainer.main \
 	data.val_files=k1000dai/libero-fasttoken-v3@val \
 	data.min_pixels=65530 \
     algorithm.disable_kl=True \
-    worker.actor.loss_type=gspo_token \ # Use gspo_token loss for pick-and-place tasks
-    worker.actor.loss_avg_mode=seq \ # Average loss over sequence length
+    worker.actor.loss_type=gspo_token \
+    worker.actor.loss_avg_mode=seq \
     worker.actor.clip_ratio_low=3e-4 \
     worker.actor.clip_ratio_high=4e-4 \
 	worker.actor.model.model_path=${MODEL_PATH} \
