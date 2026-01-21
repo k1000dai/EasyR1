@@ -26,5 +26,5 @@ worker.actor.offload.offload_params=false \
 worker.actor.offload.offload_optimizer=false \
 worker.ref.fsdp.enable_cpu_offload=false \
 worker.reward.reward_function=./examples/reward_function/libero_token.py:compute_score \
-trainer.experiment_name=qwen3_vl_8b_libero_fasttoken_gspo_kddi_detokenize \
+trainer.experiment_name=qwen3_vl_8b_libero_fasttoken_gspo_kddi_detokenize_fastonly \
 trainer.n_gpus_per_node=8
