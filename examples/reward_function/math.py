@@ -34,17 +34,33 @@ def accuracy_reward(response: str, ground_truth: str) -> float:
     return 1.0 if grade_answer(answer, ground_truth) else 0.0
 
 
-def compute_score(reward_inputs: list[dict[str, Any]], format_weight: float = 0.1) -> list[dict[str, float]]:
+def reasoning_length_reward(response: str, max_tokens: int = 500) -> float:
+    match = re.search(r"<think>(.*?)</think>", response, re.DOTALL)
+    reasoning = match.group(1) if match else ""
+    token_count = len(re.findall(r"\S+", reasoning))
+    return 0.0 if token_count > max_tokens else 1.0
+
+
+def compute_score(
+    reward_inputs: list[dict[str, Any]],
+    format_weight: float = 0.1,
+    length_weight: float = 0.1,
+    max_reasoning_tokens: int = 500,
+) -> list[dict[str, float]]:
     scores = []
     for reward_input in reward_inputs:
         response = re.sub(r"\s*(<|>|/)\s*", r"\1", reward_input["response"])  # handle qwen2.5vl-32b format
         format_score = format_reward(response)
         accuracy_score = accuracy_reward(response, reward_input["ground_truth"])
+        length_score = reasoning_length_reward(response, max_tokens=max_reasoning_tokens)
         scores.append(
             {
-                "overall": (1 - format_weight) * accuracy_score + format_weight * format_score,
+                "overall": (1 - format_weight - length_weight) * accuracy_score
+                + format_weight * format_score
+                + length_weight * length_score,
                 "format": format_score,
                 "accuracy": accuracy_score,
+                "length": length_score,
             }
         )
 
